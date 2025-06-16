@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 12, 2025 at 01:38 PM
+-- Generation Time: Jun 16, 2025 at 05:23 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -110,10 +110,10 @@ CREATE TABLE `alumni` (
 --
 
 INSERT INTO `alumni` (`aid`, `aname`, `linkedin_url`, `adept`, `abatch`, `apost`, `company`, `package`, `aphone`, `aaddress`, `message`, `image`, `status`) VALUES
-('2210121245502', 'nikhil k', 'sadf', 'computer', 0, 'manager', 'edfs', 58, 91112432001, 'efw', 'werf', 'https://drive.google.com/uc?id=1nx6GtGHLYR9ljic4EZqAC-s2UxWt352X', 'Active'),
-('22101212845502', 'nikhil k', 'sadf', 'computer', 0, 'manager', 'edfs', 58, 99999999999, 'efw', 'werf', 'https://drive.google.com/uc?id=1nx6GtGHLYR9ljic4EZqAC-s2UxWt352X', 'Active'),
-('28801212845502', 'nikhil k', 'sadf', 'computer', 0, 'manager', 'edfs', 58, 8888240411, 'efw', 'werf', 'https://drive.google.com/uc?id=1nx6GtGHLYR9ljic4EZqAC-s2UxWt352X', 'Active'),
-('44801212845502', 'nikhil k', 'sadf', 'computer', 0, 'manager', 'edfs', 58, 9988240411, 'efw', 'werf', 'https://drive.google.com/uc?id=1nx6GtGHLYR9ljic4EZqAC-s2UxWt352X', 'Active');
+('2210121245502', 'nikhil k', 'sadf', 'CSE', 0, 'Web developer', 'google', 3, 91112432001, 'nanded', 'werf', 'https://drive.google.com/uc?id=1M-fJ9BO1ir1acgx1Cr3lEtQE5q8Pi0So', 'Active'),
+('22101212845502', 'Saraswati Adkine', 'sadf', 'EE', 0, 'Electrical Helper', 'Relience', 7, 99999999999, 'efw', 'werf', 'https://drive.google.com/uc?id=1mKvo1Jf-P5HmBP9xo4dqcdPYkbK-SiPl', 'Active'),
+('28801212845502', 'Pooja Kale', 'sadf', 'CSE', 0, 'Hardware Engineer', 'TCS', 8, 8888240411, 'efw', 'werf', 'https://drive.google.com/uc?id=1nx6GtGHLYR9ljic4EZqAC-s2UxWt352X', 'Active'),
+('44801212845502', 'Jyoti Kokare', 'sadf', 'CSE', 0, 'Frontend Engineering', 'ABC Corporation', 7, 9988240411, 'latur', 'werf', 'https://drive.google.com/uc?id=1nx6GtGHLYR9ljic4EZqAC-s2UxWt352X', 'Active');
 
 -- --------------------------------------------------------
 
@@ -193,7 +193,7 @@ CREATE TABLE `collegedepartment` (
   `established` decimal(50,0) NOT NULL,
   `idhod` varchar(400) NOT NULL,
   `dhod` varchar(255) NOT NULL,
-  `hodmessage` varchar(500) NOT NULL,
+  `hodmessage` varchar(5000) NOT NULL,
   `hodemail` varchar(255) NOT NULL,
   `hodphone` bigint(20) NOT NULL,
   `dstudent` int(11) NOT NULL,
@@ -213,7 +213,7 @@ CREATE TABLE `collegedepartment` (
 --
 
 INSERT INTO `collegedepartment` (`id`, `code`, `dname`, `established`, `idhod`, `dhod`, `hodmessage`, `hodemail`, `hodphone`, `dstudent`, `dteacher`, `dclassroom`, `dlabs`, `dmassage`, `dabout`, `vision`, `mission`, `dcurriculum`, `timetable`) VALUES
-(6, 'CSE', 'Computer Engineering', 2018, '1vd_eDXnDhhFz1WUKj3RErWg3bQ3fHo8X', 'Prof. Chetan  Andhare', 'hod message', 'chetanandhare@gmail.com', 91124005522, 150, 5, 4, 3, 'Welcome to the Department of computer engineering at gcoey! As the Head of Department (HOD), it gives me immense pleasure to extend a warm greeting to all students, faculty members, staff, and visitors. Our department is committed to providing a nurturing and intellectually stimulating environment where students can excel academically, develop essential skills, and pursue their passions in technicaly]. ', 'The Computer Department at our college is a dynamic hub of innovation and learning, dedicated to fostering excellence in the field of computer science and technology. With a strong emphasis on theoretical knowledge and practical application, our department offers cutting-edge programs that equip students with the skills and expertise needed to thrive in the rapidly evolving IT industry. ', 'A vision statement outlines what the organization wants to be or how it wants the world in which it operates to be. It is a long-term view and concentrates on the future. It can be emotive and is a source of inspiration.', 'A mission statement defines the organization\'s purpose and primary objectives. Its focus is on what the organization does and its primary purpose. It should guide the actions of the organization, spell out its overall goal, provide a path, and guide decision-making.', 'Revised-Computer-Engg-Syllabus-wef-2021 (1).pdf', 'cotimetable (3).jpg');
+(6, 'CSE', 'Computer Engineering', 2018, '1vd_eDXnDhhFz1WUKj3RErWg3bQ3fHo8X', 'Prof. Chetan  Andhare', 'Dear Students and Visitors,\r\n\r\nWarm greetings from the Department of Computer Engineering at Government College of Engineering Yavatmal. Since its establishment in 2018, our department has been committed to providing quality education and shaping skilled professionals in the field of Computer Engineering.\r\n\r\nComputer Engineering is an ever-evolving discipline that plays a pivotal role in driving innovation and technological progress. It encompasses diverse areas, such as software development, artificial intelligence, data science, cybersecurity, and more. Our team of passionate and dedicated faculty members is committed to imparting knowledge and guiding students on their academic journey.\r\n\r\nIn our department, we strongly believe in inclusivity and diversity and as we stride ahead on our path of growth and evolution, we pledge to cultivate an environment of innovation and creativity. Moving forward, we are enthusiastic about making meaningful contributions to the technological landscape and solving real-world challenges through innovation and collaboration. Our goal is to empower our graduates with the skills and knowledge necessary to thrive in the competitive global landscape and make positive contributions to society.\r\n\r\nTo all our students, I extend my best wishes as you embark on this exciting journey of learning and self-discovery. Together, let\'s make a difference in the world of Computer Engineering and create a brighter future for all.', 'chetanandhare@gmail.com', 91124005522, 280, 8, 6, 3, 'Welcome to the Department of computer engineering at gcoey! As the Head of Department (HOD), it gives me immense pleasure to extend a warm greeting to all students, faculty members, staff, and visitors. Our department is committed to providing a nurturing and intellectually stimulating environment where students can excel academically, develop essential skills, and pursue their passions in technicaly]. ', 'The Computer Department at our college is a dynamic hub of innovation and learning, dedicated to fostering excellence in the field of computer science and technology. With a strong emphasis on theoretical knowledge and practical application, our department offers cutting-edge programs that equip students with the skills and expertise needed to thrive in the rapidly evolving IT industry. ', 'A vision statement outlines what the organization wants to be or how it wants the world in which it operates to be. It is a long-term view and concentrates on the future. It can be emotive and is a source of inspiration.', 'A mission statement defines the organization\'s purpose and primary objectives. Its focus is on what the organization does and its primary purpose. It should guide the actions of the organization, spell out its overall goal, provide a path, and guide decision-making.', 'Revised-Computer-Engg-Syllabus-wef-2021 (1).pdf', 'cotimetable (3).jpg');
 
 -- --------------------------------------------------------
 
@@ -388,8 +388,7 @@ INSERT INTO `gallary` (`id`, `url`, `title`, `category`, `upload_date`) VALUES
 (35, 'https://drive.google.com/uc?id=19ACPc-A5m7nQgJamz2fC9qbqSB30dnHY', 'crush 1.0', 'events', '2025-06-05 18:30:00'),
 (36, 'https://drive.google.com/uc?id=1bxNHbiDoDoZPL0L6_XMobTSfqNAWuM78', 'crush 1.0', 'events', '2025-06-05 18:30:00'),
 (37, 'https://drive.google.com/uc?id=1eRO_5Ofam_g5P0VJqdqmftLo_Gvwljt_', 'crush 1.0 winner', 'events', '2025-06-05 18:30:00'),
-(38, 'https://drive.google.com/uc?id=1_NcBFy9md5bi0kmBZM_FFcfT4CsSpma0', 'crush 1.0 1st runner up', 'events', '2025-06-05 18:30:00'),
-(39, 'https://drive.google.com/uc?id=1-iktfmaTIn4Z2-E5X7_2HrBsH2e0M5cb', 'fdgbf', 'campus', '2025-06-10 18:30:00');
+(38, 'https://drive.google.com/uc?id=1_NcBFy9md5bi0kmBZM_FFcfT4CsSpma0', 'crush 1.0 1st runner up', 'events', '2025-06-05 18:30:00');
 
 -- --------------------------------------------------------
 
@@ -455,11 +454,11 @@ CREATE TABLE `notices` (
   `nid` int(11) NOT NULL,
   `tid` varchar(20) NOT NULL,
   `dept` varchar(50) NOT NULL,
-  `title` varchar(50) NOT NULL,
-  `description` varchar(200) NOT NULL,
+  `title` varchar(1000) NOT NULL,
+  `description` varchar(4000) NOT NULL,
   `date` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `priority` varchar(20) NOT NULL,
-  `attachments` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`attachments`))
+  `attachments` varchar(5000) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -467,8 +466,8 @@ CREATE TABLE `notices` (
 --
 
 INSERT INTO `notices` (`nid`, `tid`, `dept`, `title`, `description`, `date`, `priority`, `attachments`) VALUES
-(3, 'CO72', 'CSE', 'title', 'description', '2025-06-09 10:09:25', 'high', ''),
-(7, 'CO72', 'CSE', 'ok', 'ok', '2025-06-09 10:09:25', 'medium', '');
+(8, 'CO72', 'CSE', 'Smart Grid Technology', 'The session will be conducted by Dr. Sneha Kulkarni, Professor at VNIT Nagpur. All final year students are required to attend. Participation certificates will be provided.\r\n\r\nFor further information, contact the department office.', '2025-06-16 11:56:27', 'high', 'dd'),
+(9, 'CO72', 'CSE', 'AI Trends in 2025', 'The session will be conducted by Dr. Sneha Kulkarni, Professor at VNIT Nagpur. All final year students are required to attend. Participation certificates will be provided.\r\n\r\nFor further information, contact the department office.', '2025-06-16 11:56:59', 'high', 'dd');
 
 -- --------------------------------------------------------
 
@@ -675,15 +674,17 @@ CREATE TABLE `teacher` (
   `taddress` varchar(100) NOT NULL,
   `tphoto` varchar(400) NOT NULL,
   `tlinkedin` varchar(200) NOT NULL,
-  `stetus` int(11) NOT NULL
+  `status` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `teacher`
 --
 
-INSERT INTO `teacher` (`tid`, `teacher_id`, `tname`, `temail`, `tgender`, `tpassword`, `tqualification`, `tbio`, `tdept`, `tpost`, `tphone`, `texperience`, `taddress`, `tphoto`, `tlinkedin`, `stetus`) VALUES
-(15, 'CO46', 'Shweta A. Junghare', 'shwetajunghare7@gmail.com', 'Female', 'Shweta1234', 'ME IN Computer Engineering', 'Specializes in Artificial Intelligence and Machine Learning with over 15 years of research experience. Published 50+ papers in top-tier conferences.', 'CSE', 'Teaching staff', 8975647701, 3, 'Gandhi Chowk Kalamb, Yavatmal, maharashtra', '1zf11DvE4OtGeg0r6Iq5yByTWgTeETGz7', 'https://www.linkedin.com/404/', 1);
+INSERT INTO `teacher` (`tid`, `teacher_id`, `tname`, `temail`, `tgender`, `tpassword`, `tqualification`, `tbio`, `tdept`, `tpost`, `tphone`, `texperience`, `taddress`, `tphoto`, `tlinkedin`, `status`) VALUES
+(15, 'CO46', 'Shweta A. Junghare', 'shwetajunghare7@gmail.com', 'Female', 'Shweta1234', 'ME IN Computer Engineering', 'Specializes in Artificial Intelligence and Machine Learning with over 15 years of research experience. Published 50+ papers in top-tier conferences.', 'CSE', 'Teaching staff', 8975647701, 3, 'Gandhi Chowk Kalamb, Yavatmal, maharashtra', '1zf11sfssvDvE4OtGeg0r6Iq5yByTWsdvgTeETGz7', 'https://www.linkedin.com/404/', 1),
+(16, 'CO48', 'Vivek Rajendra Shelke', 'vivekshelke55@gmail.com', 'Female', 'Shweta1234', 'ME IN Computer Engineering', 'Specializes in Artificial Intelligence and Machine Learning with over 15 years of research experience. Published 50+ papers in top-tier conferences.', 'CSE', 'Teaching staff', 8975647788, 3, 'Gandhi Chowk Kalamb, Yavatmal, maharashtra', '1zf11DvE4OtGeg0r6Iq5yByTmWgTeETGz7', 'https://www.linkedin.com/404/', 1),
+(19, 'CO49', 'Rashmi Thakre', 'RashmiThakre58@gmail.com', 'Female', 'Rashmi Thakre1234', 'ME IN Computer Engineering', 'Specializes in Artificial Intelligence and Machine Learning with over 15 years of research experience. Published 50+ papers in top-tier conferences.', 'CSE', 'Teaching staff', 8988647788, 3, 'Gandhi Chowk Kalamb, Yavatmal, maharashtra', '1zf11DvE4OtGeg0r6Iq5yByTmWgTeETGz7', 'https://www.linkedin.com/404/', 1);
 
 -- --------------------------------------------------------
 
@@ -981,7 +982,7 @@ ALTER TABLE `news`
 -- AUTO_INCREMENT for table `notices`
 --
 ALTER TABLE `notices`
-  MODIFY `nid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `nid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `posts`
@@ -1017,7 +1018,7 @@ ALTER TABLE `tcapplication`
 -- AUTO_INCREMENT for table `teacher`
 --
 ALTER TABLE `teacher`
-  MODIFY `tid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `tid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `uploads`
