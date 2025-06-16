@@ -9,6 +9,7 @@ import {
   Upload,
   Download,
   Filter,
+  RefreshCcw,
 } from "lucide-react";
 
 const StudentManagementPortal = () => {
@@ -47,29 +48,30 @@ const StudentManagementPortal = () => {
     status: 1,
   };
 
-  useEffect(() => {
-    async function fetchStudent() {
-      try {
-        setLoading(true);
-        const res = await fetch(`/api/student`);
+  const fetchStudent = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/student`);
 
-        if (!res.ok) {
-          throw new Error(`Failed to fetch student data: ${res.status}`);
-        }
-
-        const data = await res.json();
-
-        if (!data || data.length === 0) {
-          throw new Error("student not found");
-        }
-
-        setStudents(data);
-      } catch (err) {
-        console.error("Error fetching student:", err);
-      } finally {
-        setLoading(false);
+      if (!res.ok) {
+        throw new Error(`Failed to fetch student data: ${res.status}`);
       }
+
+      const data = await res.json();
+
+      if (!data || data.length === 0) {
+        throw new Error("student not found");
+      }
+
+      setStudents(data);
+    } catch (err) {
+      console.error("Error fetching student:", err);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
     fetchStudent();
   }, []);
 
@@ -192,9 +194,13 @@ const StudentManagementPortal = () => {
               <option value="0">Inactive</option>
             </select>
 
-            <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
-              <Download size={20} />
-              Export CSV
+            <button
+              onClick={() => {
+                fetchStudent();
+              }}
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+            >
+              <RefreshCcw size={20} />
             </button>
           </div>
         </div>
