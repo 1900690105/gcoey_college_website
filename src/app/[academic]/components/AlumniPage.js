@@ -10,6 +10,8 @@ import {
   Calendar,
   DollarSign,
 } from "lucide-react";
+import { fetchAlumni } from "@/app/apicall/Alumni";
+import Image from "next/image";
 
 const AlumniPage = () => {
   const [alumni, setAlumni] = useState([]);
@@ -21,100 +23,23 @@ const AlumniPage = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   // Sample data - replace with your API call
-  const [sampleAlumni, setSampleAlumni] = useState([
-    {
-      aid: 1,
-      aname: "Rajesh Kumar",
-      linkedin_url: "https://linkedin.com/in/rajesh-kumar",
-      adept: "Computer Science",
-      abatch: "2020",
-      apost: "Software Engineer",
-      company: "Google",
-      package: "₹25 LPA",
-      aphone: "+91-9876543210",
-      aaddress: "Bangalore, Karnataka",
-      message:
-        "Grateful for the foundation provided by our college. Always happy to guide current students!",
-      image: "/api/placeholder/150/150",
-    },
-    {
-      aid: 2,
-      aname: "Priya Sharma",
-      linkedin_url: "https://linkedin.com/in/priya-sharma",
-      adept: "Electronics",
-      abatch: "2019",
-      apost: "Product Manager",
-      company: "Microsoft",
-      package: "₹30 LPA",
-      aphone: "+91-9876543211",
-      aaddress: "Hyderabad, Telangana",
-      message:
-        "The technical skills and problem-solving mindset I developed here have been invaluable in my career.",
-      image: "/api/placeholder/150/150",
-    },
-    {
-      aid: 3,
-      aname: "Amit Patel",
-      linkedin_url: "https://linkedin.com/in/amit-patel",
-      adept: "Mechanical",
-      abatch: "2018",
-      apost: "Design Engineer",
-      company: "Tesla",
-      package: "₹35 LPA",
-      aphone: "+91-9876543212",
-      aaddress: "Pune, Maharashtra",
-      message:
-        "College taught me not just engineering, but how to think innovatively. Proud to be an alumnus!",
-      image: "/api/placeholder/150/150",
-    },
-    {
-      aid: 4,
-      aname: "Sneha Reddy",
-      linkedin_url: "https://linkedin.com/in/sneha-reddy",
-      adept: "Computer Science",
-      abatch: "2021",
-      apost: "Data Scientist",
-      company: "Amazon",
-      package: "₹28 LPA",
-      aphone: "+91-9876543213",
-      aaddress: "Chennai, Tamil Nadu",
-      message:
-        "The research opportunities and mentorship here shaped my career in data science.",
-      image: "/api/placeholder/150/150",
-    },
-    {
-      aid: 5,
-      aname: "Karthik Nair",
-      linkedin_url: "https://linkedin.com/in/karthik-nair",
-      adept: "Civil",
-      abatch: "2017",
-      apost: "Project Manager",
-      company: "L&T Construction",
-      package: "₹22 LPA",
-      aphone: "+91-9876543214",
-      aaddress: "Mumbai, Maharashtra",
-      message:
-        "From classroom projects to real-world construction - the journey has been incredible!",
-      image: "/api/placeholder/150/150",
-    },
-  ]);
+  const [sampleAlumni, setSampleAlumni] = useState([]);
 
   // Simulate API call
   useEffect(() => {
-    const fetchAlumni = async () => {
-      setIsLoading(true);
-      // Replace this with your actual API call
-      const response = await fetch("/api/alumni");
-      const data = await response.json();
-      setSampleAlumni(data);
-      setTimeout(() => {
-        setAlumni(sampleAlumni);
-        setFilteredAlumni(sampleAlumni);
+    const getEvents = async () => {
+      try {
+        setIsLoading(true);
+        const data = await fetchAlumni();
+        setAlumni(data);
+      } catch (err) {
+        console.error("Error fetching events:", err);
+      } finally {
         setIsLoading(false);
-      }, 1000);
+      }
     };
 
-    fetchAlumni();
+    getEvents();
   }, []);
 
   // Filter alumni based on search and filters
@@ -151,9 +76,11 @@ const AlumniPage = () => {
       <div className="relative">
         <div className="h-32 bg-gradient-to-r from-blue-500 to-purple-600"></div>
         <div className="absolute -bottom-12 left-6">
-          <img
+          <Image
             src={person.image}
             alt={person.aname}
+            height={240}
+            width={240}
             className="w-24 h-24 rounded-full border-4 border-white shadow-lg object-cover"
           />
         </div>

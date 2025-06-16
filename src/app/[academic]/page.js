@@ -13,6 +13,7 @@ import PortfolioDistribution from "./components/Portfolio";
 import AlumniPage from "./components/AlumniPage";
 import FacultyDirectory from "./components/Faculty";
 import CollegeEventsSection from "../components/Events";
+import PhotosPage from "./components/Photospage";
 
 const page = () => {
   const params = useSearchParams();
@@ -32,6 +33,7 @@ const page = () => {
         {component === "Alumni" && <AlumniPage />}
         {component === "Faculty" && <FacultyDirectory />}
         {component === "Event" && <CollegeEventsSection />}
+        {component === "Photo" && <PhotosPage />}
       </div>
     </>
   );
