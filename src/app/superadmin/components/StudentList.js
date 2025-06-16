@@ -12,43 +12,14 @@ import {
 } from "lucide-react";
 
 const StudentManagementPortal = () => {
-  const [students, setStudents] = useState([
-    {
-      id: 1,
-      prn: "PRN001",
-      name: "John",
-      father: "Michael Smith",
-      surname: "Smith",
-      mother: "Sarah Smith",
-      dob: "2002-05-15",
-      gender: "Male",
-      phone: "9876543210",
-      pphone: "9876543211",
-      email: "john.smith@college.edu",
-      religion: "Christian",
-      category: "General",
-      caste: "General",
-      city: "Mumbai",
-      state: "Maharashtra",
-      address: "123 Main Street, Andheri",
-      pincode: "400001",
-      dept: "Computer Science",
-      class: "BE-IT",
-      cgpa: 8.5,
-      rollno: "IT001",
-      image: null,
-      marksheet: null,
-      status: 1,
-    },
-  ]);
-
+  const [students, setStudents] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState("add"); // add, edit, view
   const [currentStudent, setCurrentStudent] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
   const [filterDept, setFilterDept] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
-
+  const [loading, setLoading] = useState(false);
   const initialStudentState = {
     prn: "",
     name: "",
@@ -76,13 +47,33 @@ const StudentManagementPortal = () => {
     status: 1,
   };
 
-  const departments = [
-    "Computer Science",
-    "Electronics",
-    "Mechanical",
-    "Civil",
-    "Information Technology",
-  ];
+  useEffect(() => {
+    async function fetchStudent() {
+      try {
+        setLoading(true);
+        const res = await fetch(`/api/student`);
+
+        if (!res.ok) {
+          throw new Error(`Failed to fetch student data: ${res.status}`);
+        }
+
+        const data = await res.json();
+
+        if (!data || data.length === 0) {
+          throw new Error("student not found");
+        }
+
+        setStudents(data);
+      } catch (err) {
+        console.error("Error fetching student:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchStudent();
+  }, []);
+
+  const departments = ["CSE", "EE", "ME", "CE", "EXTC"];
   const genders = ["Male", "Female", "Other"];
   const categories = ["General", "OBC", "SC", "ST", "EWS"];
   const religions = [

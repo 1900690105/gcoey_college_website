@@ -103,7 +103,6 @@ const AdminSidebar = ({ setActiveItem, activeItem }) => {
       children: [
         { id: "students", label: "Students", path: "/admin/users/students" },
         { id: "faculty", label: "Faculty", path: "/admin/users/faculty" },
-        { id: "staff", label: "Staff", path: "/admin/users/staff" },
         { id: "alumni", label: "Alumni", path: "/admin/users/alumni" },
         {
           id: "roles",
