@@ -72,7 +72,7 @@ export default function AdministrationSection() {
                           <div className="flex items-center space-x-4">
                             <div className="relative">
                               <Image
-                                src={admin.administration_image}
+                                src={`https://drive.google.com/uc?export=view&id=${admin.administration_image}`}
                                 alt={`${admin.administration_name} profile`}
                                 width={64}
                                 height={64}

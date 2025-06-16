@@ -14,6 +14,7 @@ import TeacherList from "./components/TeacherList";
 import AlumniManagement from "./components/AlumniList";
 import BannerManagement from "./components/SuperAdminBanner";
 import FlashNewsManager from "./components/SuperAdminFlashNews";
+import EventManager from "./components/SuperAdminEvents";
 
 const superadmin = () => {
   const [activeItem, setActiveItem] = useState("dashboard");
@@ -45,6 +46,7 @@ const superadmin = () => {
         {activeItem === "alumni" && <AlumniManagement />}
         {activeItem === "banner" && <BannerManagement />}
         {activeItem === "flashnews" && <FlashNewsManager />}
+        {activeItem === "events" && <EventManager />}
       </div>
     </>
   );

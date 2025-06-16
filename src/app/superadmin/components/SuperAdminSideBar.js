@@ -167,7 +167,7 @@ const AdminSidebar = ({ setActiveItem, activeItem }) => {
           path: "/admin/events/academic",
         },
         {
-          id: "college-events",
+          id: "events",
           label: "College Events",
           path: "/admin/events/college",
         },
