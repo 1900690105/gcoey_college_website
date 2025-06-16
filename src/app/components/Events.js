@@ -1,79 +1,28 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Calendar, Clock, MapPin, Search, Filter } from "lucide-react";
+import { fetchEvents } from "./apicall/event";
 
 const CollegeEventsSection = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  // Sample event data - replace with your actual data
-  const events = [
-    {
-      eid: "EVT001",
-      etitle: "Annual Tech Symposium 2025",
-      eimage:
-        "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&h=250&fit=crop",
-      date: "2025-07-15",
-      etime: "09:00 AM",
-      eplace: "Main Auditorium, Block A",
-      description:
-        "Join us for an exciting day of technology presentations, workshops, and networking with industry experts. Featuring keynote speakers from top tech companies and hands-on coding sessions.",
-    },
-    {
-      eid: "EVT002",
-      etitle: "Cultural Fest - Kaleidoscope",
-      eimage:
-        "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=250&fit=crop",
-      date: "2025-07-22",
-      etime: "06:00 PM",
-      eplace: "Campus Ground",
-      description:
-        "Experience the vibrant culture of our college through music, dance, drama, and art competitions. Open to all students with exciting prizes and performances.",
-    },
-    {
-      eid: "EVT003",
-      etitle: "Career Fair 2025",
-      eimage:
-        "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=250&fit=crop",
-      date: "2025-07-28",
-      etime: "10:00 AM",
-      eplace: "Sports Complex",
-      description:
-        "Connect with top employers and explore career opportunities. Over 50 companies participating with on-spot interviews and internship offers.",
-    },
-    {
-      eid: "EVT004",
-      etitle: "Science Exhibition",
-      eimage:
-        "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=400&h=250&fit=crop",
-      date: "2025-08-05",
-      etime: "11:00 AM",
-      eplace: "Science Block, Hall 1",
-      description:
-        "Showcase of innovative projects and research work by students from various departments. Interactive exhibits and demonstrations.",
-    },
-    {
-      eid: "EVT005",
-      etitle: "Alumni Meet 2025",
-      eimage:
-        "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=400&h=250&fit=crop",
-      date: "2025-08-12",
-      etime: "04:00 PM",
-      eplace: "Convention Center",
-      description:
-        "Reconnect with fellow alumni, share experiences, and network with professionals across various industries. Dinner and entertainment included.",
-    },
-    {
-      eid: "EVT006",
-      etitle: "Sports Day Championship",
-      eimage:
-        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=250&fit=crop",
-      date: "2025-08-18",
-      etime: "08:00 AM",
-      eplace: "Athletic Track & Field",
-      description:
-        "Annual inter-department sports competition featuring track and field events, team sports, and individual competitions. Medals and trophies for winners.",
-    },
-  ];
+  useEffect(() => {
+    const getEvents = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchEvents();
+        setEvents(data);
+      } catch (err) {
+        console.error("Error fetching events:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getEvents();
+  }, []);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);

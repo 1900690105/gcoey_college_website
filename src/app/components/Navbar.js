@@ -72,13 +72,13 @@ const Header = () => {
       href: "/students",
       hasDropdown: true,
       dropdownItems: [
-        { name: "Alumni", href: "/students?page=Alumni" },
-        { name: "Event", href: "/students?page=Event" },
-        { name: "Photo Gallery", href: "/students?page=Photo" },
-        { name: "Scholarship & Awards", href: "/students?page=Scholarship" },
+        { name: "Alumni", href: "/stdcorner?page=Alumni" },
+        { name: "Event", href: "/stdcorner?page=Event" },
+        { name: "Photo Gallery", href: "/stdcorner?page=Photo" },
+        { name: "Scholarship & Awards", href: "/stdcorner?page=Scholarship" },
         {
           name: "Student Support Facilities",
-          href: "/students?page=Facilities",
+          href: "/stdcorner?page=Facilities",
         },
         { name: "Registration", href: "/auth?page=Registration" },
         { name: "Login", href: "/auth?page=Login" },
@@ -97,7 +97,7 @@ const Header = () => {
         { name: "Presearch Knowledge", href: "/#" },
         { name: "MockInterview", href: "/#" },
         { name: "Coding Practice", href: "/#" },
-        { name: "Login", href: "/students/activities" },
+        { name: "Login", href: "/stdcorner/activities" },
       ],
     },
 

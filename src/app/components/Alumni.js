@@ -2,25 +2,27 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { fetchAlumni } from "../apicall/Alumni";
 
 export function Alumni() {
   const [alumni, setAlumni] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchAlumni() {
+    const getEvents = async () => {
       try {
-        const res = await fetch("/api/alumni");
-        const data = await res.json();
+        setLoading(true);
+        const data = await fetchAlumni();
         const firstFour = data.slice(0, 4);
         setAlumni(firstFour);
-      } catch (error) {
-        console.error("Failed to fetch alumni:", error);
+      } catch (err) {
+        console.error("Error fetching events:", err);
       } finally {
         setLoading(false);
       }
-    }
-    fetchAlumni();
+    };
+
+    getEvents();
   }, []);
 
   if (loading) {

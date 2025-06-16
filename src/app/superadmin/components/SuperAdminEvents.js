@@ -11,6 +11,7 @@ import {
   Search,
   Filter,
 } from "lucide-react";
+import { fetchEvents } from "@/app/components/apicall/event";
 
 const EventManager = () => {
   const [events, setEvents] = useState([]);
@@ -30,31 +31,20 @@ const EventManager = () => {
     edescription: "",
   });
 
-  const fetchEvents = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch(`/api/event`);
-
-      if (!res.ok) {
-        throw new Error(`Failed to fetch event data: ${res.status}`);
-      }
-
-      const data = await res.json();
-
-      if (!data || data.length === 0) {
-        throw new Error("event not found");
-      }
-
-      setEvents(data);
-    } catch (err) {
-      console.error("Error fetching event:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchEvents();
+    const getEvents = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchEvents();
+        setEvents(data);
+      } catch (err) {
+        console.error("Error fetching events:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getEvents();
   }, []);
 
   const saveEvent = async () => {
