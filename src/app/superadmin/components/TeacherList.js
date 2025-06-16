@@ -16,54 +16,8 @@ import {
 } from "lucide-react";
 
 const TeacherList = () => {
-  const [teachers, setTeachers] = useState([
-    {
-      tid: 1,
-      teacher_id: "T001",
-      tname: "Dr. Sarah Johnson",
-      temail: "sarah.johnson@school.edu",
-      tgender: "Female",
-      tqualification: "Ph.D Computer Science",
-      tdept: "Computer Science",
-      tpost: "Professor",
-      tphone: "+1-555-0123",
-      texperience: "12 years",
-      taddress: "123 Oak Street, Springfield, IL",
-      tphoto: null,
-      status: 1,
-    },
-    {
-      tid: 2,
-      teacher_id: "T002",
-      tname: "Prof. Michael Chen",
-      temail: "michael.chen@school.edu",
-      tgender: "Male",
-      tqualification: "M.Sc Mathematics",
-      tdept: "Mathematics",
-      tpost: "Associate Professor",
-      tphone: "+1-555-0124",
-      texperience: "8 years",
-      taddress: "456 Pine Avenue, Springfield, IL",
-      tphoto: null,
-      status: 1,
-    },
-    {
-      tid: 3,
-      teacher_id: "T003",
-      tname: "Dr. Emily Rodriguez",
-      temail: "emily.rodriguez@school.edu",
-      tgender: "Female",
-      tqualification: "Ph.D Physics",
-      tdept: "Physics",
-      tpost: "Assistant Professor",
-      tphone: "+1-555-0125",
-      texperience: "5 years",
-      taddress: "789 Elm Street, Springfield, IL",
-      tphoto: null,
-      status: 0,
-    },
-  ]);
-
+  const [teachers, setTeachers] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterDept, setFilterDept] = useState("all");
@@ -85,15 +39,33 @@ const TeacherList = () => {
     status: 1,
   });
 
-  const departments = [
-    "Computer Science",
-    "Mathematics",
-    "Physics",
-    "Chemistry",
-    "Biology",
-    "English",
-    "History",
-  ];
+  useEffect(() => {
+    async function fetchTeacher() {
+      try {
+        setLoading(true);
+        const res = await fetch(`/api/teacher`);
+
+        if (!res.ok) {
+          throw new Error(`Failed to fetch teacher data: ${res.status}`);
+        }
+
+        const data = await res.json();
+
+        if (!data || data.length === 0) {
+          throw new Error("teacher not found");
+        }
+
+        setTeachers(data);
+      } catch (err) {
+        console.error("Error fetching teacher:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchTeacher();
+  }, []);
+
+  const departments = ["CSE", "ME", "EE", "CE", "EXtc"];
   const posts = [
     "Professor",
     "Associate Professor",
