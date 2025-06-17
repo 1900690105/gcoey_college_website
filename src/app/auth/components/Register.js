@@ -1,10 +1,7 @@
 import { useState } from "react";
 import {
   User,
-  Mail,
-  Phone,
   MapPin,
-  Calendar,
   BookOpen,
   Upload,
   Eye,
@@ -1055,7 +1052,7 @@ export default function StudentRegistration() {
         isOpen={showSuccess}
         onClose={() => {
           setShowSuccess(false);
-          window.location.href = "/auth?page=login";
+          window.location.href = "/auth?page=Login";
         }}
         studentId={studentId}
       />
