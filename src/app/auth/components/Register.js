@@ -369,6 +369,19 @@ export default function StudentRegistration() {
   ];
 
   const options = {
+    religion: [
+      { value: "", label: "Select Religion" },
+      { value: "hinduism", label: "Hinduism" },
+      { value: "islam", label: "Islam" },
+      { value: "christianity", label: "Christianity" },
+      { value: "sikhism", label: "Sikhism" },
+      { value: "buddhism", label: "Buddhism" },
+      { value: "jainism", label: "Jainism" },
+      { value: "zoroastrianism", label: "Zoroastrianism (Parsi)" },
+      { value: "judaism", label: "Judaism" },
+      { value: "other", label: "Other" },
+    ],
+
     gender: [
       { value: "male", label: "Male" },
       { value: "female", label: "Female" },
@@ -417,6 +430,10 @@ export default function StudentRegistration() {
       { value: "2023", label: "2023" },
       { value: "2022", label: "2022" },
       { value: "2021", label: "2021" },
+    ],
+    nationality: [
+      { value: "India", label: "india" },
+      { value: "Other", label: "other" },
     ],
   };
 
@@ -516,6 +533,22 @@ export default function StudentRegistration() {
                     value={formData.bloodGroup}
                     onChange={handleInputChange}
                     options={options.bloodGroup}
+                  />
+                  <FormField
+                    label="Nationality"
+                    name="nationality"
+                    type="select"
+                    value={formData.nationality}
+                    onChange={handleInputChange}
+                    options={options.nationality}
+                  />
+                  <FormField
+                    label="Religion"
+                    name="religion"
+                    type="select"
+                    value={formData.religion}
+                    onChange={handleInputChange}
+                    options={options.religion}
                   />
                   <FormField
                     label="Category"
@@ -1001,7 +1034,10 @@ export default function StudentRegistration() {
 
       <SuccessModal
         isOpen={showSuccess}
-        onClose={() => setShowSuccess(false)}
+        onClose={() => {
+          setShowSuccess(false);
+          window.location.href = "/auth?page=login";
+        }}
         studentId={studentId}
       />
     </div>
