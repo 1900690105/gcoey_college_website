@@ -9,11 +9,149 @@ import {
   Upload,
   Eye,
   EyeOff,
+  CheckCircle,
+  AlertCircle,
 } from "lucide-react";
-import Link from "next/link";
+
+const FormField = ({
+  label,
+  name,
+  type = "text",
+  value,
+  onChange,
+  error,
+  required,
+  options,
+  placeholder,
+  className = "",
+}) => (
+  <div className={className}>
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      {label} {required && "*"}
+    </label>
+    {type === "select" ? (
+      <select
+        name={name}
+        value={value}
+        onChange={onChange}
+        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+          error ? "border-red-500" : "border-gray-300"
+        }`}
+      >
+        <option value="">{placeholder || `Select ${label}`}</option>
+        {options.map((opt) => (
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
+    ) : type === "textarea" ? (
+      <textarea
+        name={name}
+        value={value}
+        onChange={onChange}
+        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+          error ? "border-red-500" : "border-gray-300"
+        }`}
+        placeholder={placeholder}
+        rows="2"
+      />
+    ) : (
+      <input
+        type={type}
+        name={name}
+        value={value}
+        onChange={onChange}
+        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+          error ? "border-red-500" : "border-gray-300"
+        }`}
+        placeholder={placeholder}
+      />
+    )}
+    {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+  </div>
+);
+
+const FileUpload = ({ label, id, onChange, file }) => (
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      {label}
+    </label>
+    <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-400 transition-colors">
+      <input
+        type="file"
+        accept={id.includes("Certificate") ? ".pdf,.jpg,.jpeg,.png" : "image/*"}
+        onChange={onChange}
+        className="hidden"
+        id={id}
+      />
+      <label htmlFor={id} className="cursor-pointer">
+        <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+        <p className="text-sm text-gray-600">
+          Click to upload {label.toLowerCase()}
+        </p>
+        {file && <p className="text-xs text-green-600 mt-1">{file.name}</p>}
+      </label>
+    </div>
+  </div>
+);
+
+const ProgressBar = ({ steps, currentStep }) => (
+  <div className="mb-8">
+    <div className="flex items-center justify-between">
+      {steps.map((step, index) => (
+        <div key={index} className="flex items-center">
+          <div
+            className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium ${
+              index + 1 <= currentStep
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 text-gray-600"
+            }`}
+          >
+            {index + 1}
+          </div>
+          <span className="ml-2 text-sm font-medium text-gray-700">{step}</span>
+          {index < steps.length - 1 && (
+            <div
+              className={`w-20 h-1 mx-4 ${
+                index + 1 < currentStep ? "bg-blue-600" : "bg-gray-200"
+              }`}
+            />
+          )}
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+const SuccessModal = ({ isOpen, onClose, studentId }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white rounded-2xl p-8 max-w-md mx-4 text-center">
+        <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">
+          Registration Successful!
+        </h2>
+        <p className="text-gray-600 mb-2">
+          Your registration has been submitted successfully.
+        </p>
+        <p className="text-sm text-gray-500 mb-6">Student ID: {studentId}</p>
+        <button
+          onClick={onClose}
+          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          Continue
+        </button>
+      </div>
+    </div>
+  );
+};
 
 export default function StudentRegistration() {
   const [formData, setFormData] = useState({
+    // Personal
     firstName: "",
     lastName: "",
     email: "",
@@ -24,8 +162,7 @@ export default function StudentRegistration() {
     nationality: "",
     religion: "",
     category: "",
-
-    // Address Information
+    // Address
     permanentAddress: {
       street: "",
       city: "",
@@ -41,8 +178,7 @@ export default function StudentRegistration() {
       country: "India",
     },
     sameAsPermanent: false,
-
-    // Academic Information
+    // Academic
     course: "",
     branch: "",
     semester: "",
@@ -53,8 +189,7 @@ export default function StudentRegistration() {
       percentage: "",
       passingYear: "",
     },
-
-    // Guardian Information
+    // Guardian
     fatherName: "",
     fatherOccupation: "",
     fatherPhone: "",
@@ -64,8 +199,7 @@ export default function StudentRegistration() {
     guardianName: "",
     guardianRelation: "",
     guardianPhone: "",
-
-    // Documents
+    // Documents & Login
     photo: null,
     signature: null,
     documents: {
@@ -74,8 +208,6 @@ export default function StudentRegistration() {
       transferCertificate: null,
       migrationCertificate: null,
     },
-
-    // Login Credentials
     password: "",
     confirmPassword: "",
   });
@@ -84,6 +216,9 @@ export default function StudentRegistration() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [studentId, setStudentId] = useState(null);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -92,18 +227,10 @@ export default function StudentRegistration() {
       const [parent, child] = name.split(".");
       setFormData((prev) => ({
         ...prev,
-        [parent]: {
-          ...prev[parent],
-          [child]: value,
-        },
+        [parent]: { ...prev[parent], [child]: value },
       }));
     } else if (type === "checkbox") {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: checked,
-      }));
-
-      // Auto-fill current address if same as permanent
+      setFormData((prev) => ({ ...prev, [name]: checked }));
       if (name === "sameAsPermanent" && checked) {
         setFormData((prev) => ({
           ...prev,
@@ -111,10 +238,7 @@ export default function StudentRegistration() {
         }));
       }
     } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
@@ -124,67 +248,115 @@ export default function StudentRegistration() {
       const [parent, child] = fieldName.split(".");
       setFormData((prev) => ({
         ...prev,
-        [parent]: {
-          ...prev[parent],
-          [child]: file,
-        },
+        [parent]: { ...prev[parent], [child]: file },
       }));
     } else {
-      setFormData((prev) => ({
-        ...prev,
-        [fieldName]: file,
-      }));
+      setFormData((prev) => ({ ...prev, [fieldName]: file }));
     }
   };
 
   const validateStep = (step) => {
     const newErrors = {};
+    const required = {
+      1: ["firstName", "lastName", "email", "phone", "dateOfBirth"],
+      2: ["permanentAddress.street", "permanentAddress.city"],
+      3: ["course", "branch"],
+      5: ["password"],
+    };
 
-    switch (step) {
-      case 1:
-        if (!formData.firstName) newErrors.firstName = "First name is required";
-        if (!formData.lastName) newErrors.lastName = "Last name is required";
-        if (!formData.email) newErrors.email = "Email is required";
-        if (!formData.phone) newErrors.phone = "Phone number is required";
-        if (!formData.dateOfBirth)
-          newErrors.dateOfBirth = "Date of birth is required";
-        break;
-      case 2:
-        if (!formData.permanentAddress.street)
-          newErrors["permanentAddress.street"] = "Address is required";
-        if (!formData.permanentAddress.city)
-          newErrors["permanentAddress.city"] = "City is required";
-        break;
-      case 3:
-        if (!formData.course) newErrors.course = "Course is required";
-        if (!formData.branch) newErrors.branch = "Branch is required";
-        break;
-      case 5:
-        if (!formData.password) newErrors.password = "Password is required";
-        if (formData.password !== formData.confirmPassword)
-          newErrors.confirmPassword = "Passwords do not match";
-        break;
+    required[step]?.forEach((field) => {
+      const value = field.includes(".")
+        ? formData[field.split(".")[0]][field.split(".")[1]]
+        : formData[field];
+      if (!value)
+        newErrors[field] = `${field
+          .replace(/([A-Z])/g, " $1")
+          .toLowerCase()} is required`;
+    });
+
+    if (step === 5 && formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+
+    // Email validation
+    if (step === 1 && formData.email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        newErrors.email = "Please enter a valid email address";
+      }
+    }
+
+    // Phone validation
+    if (step === 1 && formData.phone) {
+      const phoneRegex = /^[0-9]{10}$/;
+      if (!phoneRegex.test(formData.phone.replace(/\D/g, ""))) {
+        newErrors.phone = "Please enter a valid 10-digit phone number";
+      }
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const nextStep = () => {
-    if (validateStep(currentStep)) {
-      setCurrentStep((prev) => Math.min(prev + 1, 5));
-    }
-  };
+  const nextStep = () =>
+    validateStep(currentStep) &&
+    setCurrentStep((prev) => Math.min(prev + 1, 5));
+  const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
 
-  const prevStep = () => {
-    setCurrentStep((prev) => Math.max(prev - 1, 1));
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateStep(5)) {
-      console.log("Registration Data:", formData);
-      alert("Registration submitted successfully!");
+    if (!validateStep(5)) return;
+
+    setIsSubmitting(true);
+    setErrors({});
+
+    try {
+      // Create FormData for file upload
+      const submitData = new FormData();
+
+      // Add text data
+      Object.keys(formData).forEach((key) => {
+        if (
+          key === "permanentAddress" ||
+          key === "currentAddress" ||
+          key === "previousEducation"
+        ) {
+          Object.keys(formData[key]).forEach((subKey) => {
+            submitData.append(`${key}.${subKey}`, formData[key][subKey] || "");
+          });
+        } else if (key === "documents") {
+          Object.keys(formData[key]).forEach((docKey) => {
+            if (formData[key][docKey]) {
+              submitData.append(docKey, formData[key][docKey]);
+            }
+          });
+        } else if (key === "photo" || key === "signature") {
+          if (formData[key]) {
+            submitData.append(key, formData[key]);
+          }
+        } else if (key !== "confirmPassword") {
+          submitData.append(key, formData[key] || "");
+        }
+      });
+
+      const response = await fetch("/api/student/register", {
+        method: "POST",
+        body: submitData,
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setStudentId(result.studentId);
+        setShowSuccess(true);
+      } else {
+        setErrors({ submit: result.message });
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      setErrors({ submit: "Registration failed. Please try again." });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -196,10 +368,61 @@ export default function StudentRegistration() {
     "Documents & Login",
   ];
 
+  const options = {
+    gender: [
+      { value: "male", label: "Male" },
+      { value: "female", label: "Female" },
+      { value: "other", label: "Other" },
+    ],
+    bloodGroup: [
+      { value: "A+", label: "A+" },
+      { value: "A-", label: "A-" },
+      { value: "B+", label: "B+" },
+      { value: "B-", label: "B-" },
+      { value: "AB+", label: "AB+" },
+      { value: "AB-", label: "AB-" },
+      { value: "O+", label: "O+" },
+      { value: "O-", label: "O-" },
+    ],
+    category: [
+      { value: "general", label: "General" },
+      { value: "obc", label: "OBC" },
+      { value: "sc", label: "SC" },
+      { value: "st", label: "ST" },
+    ],
+    course: [
+      { value: "btech", label: "B.Tech" },
+      { value: "mtech", label: "M.Tech" },
+      { value: "bsc", label: "B.Sc" },
+      { value: "msc", label: "M.Sc" },
+      { value: "bca", label: "BCA" },
+      { value: "mca", label: "MCA" },
+      { value: "bba", label: "BBA" },
+      { value: "mba", label: "MBA" },
+    ],
+    branch: [
+      { value: "cse", label: "Computer Science Engineering" },
+      { value: "it", label: "Information Technology" },
+      { value: "ece", label: "Electronics & Communication" },
+      { value: "mechanical", label: "Mechanical Engineering" },
+      { value: "civil", label: "Civil Engineering" },
+      { value: "electrical", label: "Electrical Engineering" },
+    ],
+    semester: Array.from({ length: 8 }, (_, i) => ({
+      value: (i + 1).toString(),
+      label: `${i + 1}${["st", "nd", "rd"][i] || "th"} Semester`,
+    })),
+    admissionYear: [
+      { value: "2024", label: "2024" },
+      { value: "2023", label: "2023" },
+      { value: "2022", label: "2022" },
+      { value: "2021", label: "2021" },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8 px-4">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">
             Student Registration
@@ -209,39 +432,18 @@ export default function StudentRegistration() {
           </p>
         </div>
 
-        {/* Progress Bar */}
-        <div className="mb-8">
-          <div className="flex justify-between items-center mb-4">
-            {steps.map((step, index) => (
-              <div key={index} className="flex flex-col items-center">
-                <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium ${
-                    index + 1 === currentStep
-                      ? "bg-blue-600 text-white"
-                      : index + 1 < currentStep
-                      ? "bg-green-500 text-white"
-                      : "bg-gray-200 text-gray-600"
-                  }`}
-                >
-                  {index + 1}
-                </div>
-                <span className="text-xs mt-1 text-gray-600 text-center">
-                  {step}
-                </span>
-              </div>
-            ))}
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div
-              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${(currentStep / steps.length) * 100}%` }}
-            ></div>
-          </div>
-        </div>
+        <ProgressBar steps={steps} currentStep={currentStep} />
 
-        {/* Form Card */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <form onSubmit={handleSubmit}>
+            {/* Global Error Message */}
+            {errors.submit && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center">
+                <AlertCircle className="w-5 h-5 text-red-500 mr-3" />
+                <p className="text-red-700">{errors.submit}</p>
+              </div>
+            )}
+
             {/* Step 1: Personal Information */}
             {currentStep === 1 && (
               <div className="space-y-6">
@@ -251,170 +453,78 @@ export default function StudentRegistration() {
                     Personal Information
                   </h2>
                 </div>
-
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      First Name *
-                    </label>
-                    <input
-                      type="text"
-                      name="firstName"
-                      value={formData.firstName}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                        errors.firstName ? "border-red-500" : "border-gray-300"
-                      }`}
-                      placeholder="Enter your first name"
-                    />
-                    {errors.firstName && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.firstName}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Last Name *
-                    </label>
-                    <input
-                      type="text"
-                      name="lastName"
-                      value={formData.lastName}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                        errors.lastName ? "border-red-500" : "border-gray-300"
-                      }`}
-                      placeholder="Enter your last name"
-                    />
-                    {errors.lastName && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.lastName}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Email Address *
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                        errors.email ? "border-red-500" : "border-gray-300"
-                      }`}
-                      placeholder="Enter your email"
-                    />
-                    {errors.email && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.email}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Phone Number *
-                    </label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                        errors.phone ? "border-red-500" : "border-gray-300"
-                      }`}
-                      placeholder="Enter your phone number"
-                    />
-                    {errors.phone && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.phone}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Date of Birth *
-                    </label>
-                    <input
-                      type="date"
-                      name="dateOfBirth"
-                      value={formData.dateOfBirth}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                        errors.dateOfBirth
-                          ? "border-red-500"
-                          : "border-gray-300"
-                      }`}
-                    />
-                    {errors.dateOfBirth && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.dateOfBirth}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Gender
-                    </label>
-                    <select
-                      name="gender"
-                      value={formData.gender}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="">Select Gender</option>
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Blood Group
-                    </label>
-                    <select
-                      name="bloodGroup"
-                      value={formData.bloodGroup}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="">Select Blood Group</option>
-                      <option value="A+">A+</option>
-                      <option value="A-">A-</option>
-                      <option value="B+">B+</option>
-                      <option value="B-">B-</option>
-                      <option value="AB+">AB+</option>
-                      <option value="AB-">AB-</option>
-                      <option value="O+">O+</option>
-                      <option value="O-">O-</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Category
-                    </label>
-                    <select
-                      name="category"
-                      value={formData.category}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="">Select Category</option>
-                      <option value="general">General</option>
-                      <option value="obc">OBC</option>
-                      <option value="sc">SC</option>
-                      <option value="st">ST</option>
-                    </select>
-                  </div>
+                  <FormField
+                    label="First Name"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleInputChange}
+                    error={errors.firstName}
+                    required
+                    placeholder="Enter your first name"
+                  />
+                  <FormField
+                    label="Last Name"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleInputChange}
+                    error={errors.lastName}
+                    required
+                    placeholder="Enter your last name"
+                  />
+                  <FormField
+                    label="Email Address"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    error={errors.email}
+                    required
+                    placeholder="Enter your email"
+                  />
+                  <FormField
+                    label="Phone Number"
+                    name="phone"
+                    type="tel"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    error={errors.phone}
+                    required
+                    placeholder="Enter your phone number"
+                  />
+                  <FormField
+                    label="Date of Birth"
+                    name="dateOfBirth"
+                    type="date"
+                    value={formData.dateOfBirth}
+                    onChange={handleInputChange}
+                    error={errors.dateOfBirth}
+                    required
+                  />
+                  <FormField
+                    label="Gender"
+                    name="gender"
+                    type="select"
+                    value={formData.gender}
+                    onChange={handleInputChange}
+                    options={options.gender}
+                  />
+                  <FormField
+                    label="Blood Group"
+                    name="bloodGroup"
+                    type="select"
+                    value={formData.bloodGroup}
+                    onChange={handleInputChange}
+                    options={options.bloodGroup}
+                  />
+                  <FormField
+                    label="Category"
+                    name="category"
+                    type="select"
+                    value={formData.category}
+                    onChange={handleInputChange}
+                    options={options.category}
+                  />
                 </div>
               </div>
             )}
@@ -429,103 +539,55 @@ export default function StudentRegistration() {
                   </h2>
                 </div>
 
-                {/* Permanent Address */}
                 <div>
                   <h3 className="text-lg font-medium text-gray-800 mb-4">
                     Permanent Address
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Street Address *
-                      </label>
-                      <textarea
-                        name="permanentAddress.street"
-                        value={formData.permanentAddress.street}
-                        onChange={handleInputChange}
-                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                          errors["permanentAddress.street"]
-                            ? "border-red-500"
-                            : "border-gray-300"
-                        }`}
-                        rows="2"
-                        placeholder="Enter your permanent address"
-                      />
-                      {errors["permanentAddress.street"] && (
-                        <p className="text-red-500 text-sm mt-1">
-                          {errors["permanentAddress.street"]}
-                        </p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        City *
-                      </label>
-                      <input
-                        type="text"
-                        name="permanentAddress.city"
-                        value={formData.permanentAddress.city}
-                        onChange={handleInputChange}
-                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                          errors["permanentAddress.city"]
-                            ? "border-red-500"
-                            : "border-gray-300"
-                        }`}
-                        placeholder="City"
-                      />
-                      {errors["permanentAddress.city"] && (
-                        <p className="text-red-500 text-sm mt-1">
-                          {errors["permanentAddress.city"]}
-                        </p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        State
-                      </label>
-                      <input
-                        type="text"
-                        name="permanentAddress.state"
-                        value={formData.permanentAddress.state}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="State"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        PIN Code
-                      </label>
-                      <input
-                        type="text"
-                        name="permanentAddress.pincode"
-                        value={formData.permanentAddress.pincode}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="PIN Code"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Country
-                      </label>
-                      <input
-                        type="text"
-                        name="permanentAddress.country"
-                        value={formData.permanentAddress.country}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Country"
-                      />
-                    </div>
+                    <FormField
+                      label="Street Address"
+                      name="permanentAddress.street"
+                      type="textarea"
+                      value={formData.permanentAddress.street}
+                      onChange={handleInputChange}
+                      error={errors["permanentAddress.street"]}
+                      required
+                      placeholder="Enter your permanent address"
+                      className="md:col-span-2"
+                    />
+                    <FormField
+                      label="City"
+                      name="permanentAddress.city"
+                      value={formData.permanentAddress.city}
+                      onChange={handleInputChange}
+                      error={errors["permanentAddress.city"]}
+                      required
+                      placeholder="City"
+                    />
+                    <FormField
+                      label="State"
+                      name="permanentAddress.state"
+                      value={formData.permanentAddress.state}
+                      onChange={handleInputChange}
+                      placeholder="State"
+                    />
+                    <FormField
+                      label="PIN Code"
+                      name="permanentAddress.pincode"
+                      value={formData.permanentAddress.pincode}
+                      onChange={handleInputChange}
+                      placeholder="PIN Code"
+                    />
+                    <FormField
+                      label="Country"
+                      name="permanentAddress.country"
+                      value={formData.permanentAddress.country}
+                      onChange={handleInputChange}
+                      placeholder="Country"
+                    />
                   </div>
                 </div>
 
-                {/* Current Address */}
                 <div>
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-medium text-gray-800">
@@ -547,75 +609,43 @@ export default function StudentRegistration() {
 
                   {!formData.sameAsPermanent && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Street Address
-                        </label>
-                        <textarea
-                          name="currentAddress.street"
-                          value={formData.currentAddress.street}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          rows="2"
-                          placeholder="Enter your current address"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          City
-                        </label>
-                        <input
-                          type="text"
-                          name="currentAddress.city"
-                          value={formData.currentAddress.city}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="City"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          State
-                        </label>
-                        <input
-                          type="text"
-                          name="currentAddress.state"
-                          value={formData.currentAddress.state}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="State"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          PIN Code
-                        </label>
-                        <input
-                          type="text"
-                          name="currentAddress.pincode"
-                          value={formData.currentAddress.pincode}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="PIN Code"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Country
-                        </label>
-                        <input
-                          type="text"
-                          name="currentAddress.country"
-                          value={formData.currentAddress.country}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="Country"
-                        />
-                      </div>
+                      <FormField
+                        label="Street Address"
+                        name="currentAddress.street"
+                        type="textarea"
+                        value={formData.currentAddress.street}
+                        onChange={handleInputChange}
+                        placeholder="Enter your current address"
+                        className="md:col-span-2"
+                      />
+                      <FormField
+                        label="City"
+                        name="currentAddress.city"
+                        value={formData.currentAddress.city}
+                        onChange={handleInputChange}
+                        placeholder="City"
+                      />
+                      <FormField
+                        label="State"
+                        name="currentAddress.state"
+                        value={formData.currentAddress.state}
+                        onChange={handleInputChange}
+                        placeholder="State"
+                      />
+                      <FormField
+                        label="PIN Code"
+                        name="currentAddress.pincode"
+                        value={formData.currentAddress.pincode}
+                        onChange={handleInputChange}
+                        placeholder="PIN Code"
+                      />
+                      <FormField
+                        label="Country"
+                        name="currentAddress.country"
+                        value={formData.currentAddress.country}
+                        onChange={handleInputChange}
+                        placeholder="Country"
+                      />
                     </div>
                   )}
                 </div>
@@ -633,164 +663,77 @@ export default function StudentRegistration() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Course *
-                    </label>
-                    <select
-                      name="course"
-                      value={formData.course}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                        errors.course ? "border-red-500" : "border-gray-300"
-                      }`}
-                    >
-                      <option value="">Select Course</option>
-                      <option value="btech">B.Tech</option>
-                      <option value="mtech">M.Tech</option>
-                      <option value="bsc">B.Sc</option>
-                      <option value="msc">M.Sc</option>
-                      <option value="bca">BCA</option>
-                      <option value="mca">MCA</option>
-                      <option value="bba">BBA</option>
-                      <option value="mba">MBA</option>
-                    </select>
-                    {errors.course && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.course}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Branch/Specialization *
-                    </label>
-                    <select
-                      name="branch"
-                      value={formData.branch}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                        errors.branch ? "border-red-500" : "border-gray-300"
-                      }`}
-                    >
-                      <option value="">Select Branch</option>
-                      <option value="cse">Computer Science Engineering</option>
-                      <option value="it">Information Technology</option>
-                      <option value="ece">Electronics & Communication</option>
-                      <option value="mechanical">Mechanical Engineering</option>
-                      <option value="civil">Civil Engineering</option>
-                      <option value="electrical">Electrical Engineering</option>
-                    </select>
-                    {errors.branch && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.branch}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Semester
-                    </label>
-                    <select
-                      name="semester"
-                      value={formData.semester}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="">Select Semester</option>
-                      <option value="1">1st Semester</option>
-                      <option value="2">2nd Semester</option>
-                      <option value="3">3rd Semester</option>
-                      <option value="4">4th Semester</option>
-                      <option value="5">5th Semester</option>
-                      <option value="6">6th Semester</option>
-                      <option value="7">7th Semester</option>
-                      <option value="8">8th Semester</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Admission Year
-                    </label>
-                    <select
-                      name="admissionYear"
-                      value={formData.admissionYear}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="">Select Year</option>
-                      <option value="2024">2024</option>
-                      <option value="2023">2023</option>
-                      <option value="2022">2022</option>
-                      <option value="2021">2021</option>
-                    </select>
-                  </div>
+                  <FormField
+                    label="Course"
+                    name="course"
+                    type="select"
+                    value={formData.course}
+                    onChange={handleInputChange}
+                    error={errors.course}
+                    required
+                    options={options.course}
+                  />
+                  <FormField
+                    label="Branch/Specialization"
+                    name="branch"
+                    type="select"
+                    value={formData.branch}
+                    onChange={handleInputChange}
+                    error={errors.branch}
+                    required
+                    options={options.branch}
+                  />
+                  <FormField
+                    label="Semester"
+                    name="semester"
+                    type="select"
+                    value={formData.semester}
+                    onChange={handleInputChange}
+                    options={options.semester}
+                  />
+                  <FormField
+                    label="Admission Year"
+                    name="admissionYear"
+                    type="select"
+                    value={formData.admissionYear}
+                    onChange={handleInputChange}
+                    options={options.admissionYear}
+                  />
                 </div>
 
-                {/* Previous Education */}
                 <div>
                   <h3 className="text-lg font-medium text-gray-800 mb-4">
                     Previous Education (12th/Intermediate)
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        School/College Name
-                      </label>
-                      <input
-                        type="text"
-                        name="previousEducation.schoolName"
-                        value={formData.previousEducation.schoolName}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="School/College name"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Board/University
-                      </label>
-                      <input
-                        type="text"
-                        name="previousEducation.board"
-                        value={formData.previousEducation.board}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Board/University"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Percentage/CGPA
-                      </label>
-                      <input
-                        type="text"
-                        name="previousEducation.percentage"
-                        value={formData.previousEducation.percentage}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Percentage or CGPA"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Passing Year
-                      </label>
-                      <input
-                        type="text"
-                        name="previousEducation.passingYear"
-                        value={formData.previousEducation.passingYear}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Passing year"
-                      />
-                    </div>
+                    <FormField
+                      label="School/College Name"
+                      name="previousEducation.schoolName"
+                      value={formData.previousEducation.schoolName}
+                      onChange={handleInputChange}
+                      placeholder="School/College name"
+                    />
+                    <FormField
+                      label="Board/University"
+                      name="previousEducation.board"
+                      value={formData.previousEducation.board}
+                      onChange={handleInputChange}
+                      placeholder="Board/University"
+                    />
+                    <FormField
+                      label="Percentage/CGPA"
+                      name="previousEducation.percentage"
+                      value={formData.previousEducation.percentage}
+                      onChange={handleInputChange}
+                      placeholder="Percentage or CGPA"
+                    />
+                    <FormField
+                      label="Passing Year"
+                      name="previousEducation.passingYear"
+                      value={formData.previousEducation.passingYear}
+                      onChange={handleInputChange}
+                      placeholder="Passing year"
+                    />
                   </div>
                 </div>
               </div>
@@ -806,155 +749,61 @@ export default function StudentRegistration() {
                   </h2>
                 </div>
 
-                {/* Father's Information */}
-                <div>
-                  <h3 className="text-lg font-medium text-gray-800 mb-4">
-                    Father's Information
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Father's Name
-                      </label>
-                      <input
-                        type="text"
-                        name="fatherName"
-                        value={formData.fatherName}
+                {[
+                  { title: "Father's Information", prefix: "father" },
+                  { title: "Mother's Information", prefix: "mother" },
+                  {
+                    title: "Guardian Information (if different from parents)",
+                    prefix: "guardian",
+                    additional: "guardianRelation",
+                  },
+                ].map(({ title, prefix, additional }) => (
+                  <div key={prefix}>
+                    <h3 className="text-lg font-medium text-gray-800 mb-4">
+                      {title}
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <FormField
+                        label={`${
+                          prefix === "guardian"
+                            ? "Guardian's"
+                            : prefix.charAt(0).toUpperCase() +
+                              prefix.slice(1) +
+                              "'s"
+                        } Name`}
+                        name={`${prefix}Name`}
+                        value={formData[`${prefix}Name`]}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Father's name"
+                        placeholder={`${prefix}'s name`}
                       />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Occupation
-                      </label>
-                      <input
-                        type="text"
-                        name="fatherOccupation"
-                        value={formData.fatherOccupation}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Father's occupation"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Phone Number
-                      </label>
-                      <input
+                      {additional ? (
+                        <FormField
+                          label="Relation"
+                          name={additional}
+                          value={formData[additional]}
+                          onChange={handleInputChange}
+                          placeholder="Relation to student"
+                        />
+                      ) : (
+                        <FormField
+                          label="Occupation"
+                          name={`${prefix}Occupation`}
+                          value={formData[`${prefix}Occupation`]}
+                          onChange={handleInputChange}
+                          placeholder={`${prefix}'s occupation`}
+                        />
+                      )}
+                      <FormField
+                        label="Phone Number"
+                        name={`${prefix}Phone`}
                         type="tel"
-                        name="fatherPhone"
-                        value={formData.fatherPhone}
+                        value={formData[`${prefix}Phone`]}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Father's phone"
+                        placeholder={`${prefix}'s phone`}
                       />
                     </div>
                   </div>
-                </div>
-
-                {/* Mother's Information */}
-                <div>
-                  <h3 className="text-lg font-medium text-gray-800 mb-4">
-                    Mother's Information
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Mother's Name
-                      </label>
-                      <input
-                        type="text"
-                        name="motherName"
-                        value={formData.motherName}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Mother's name"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Occupation
-                      </label>
-                      <input
-                        type="text"
-                        name="motherOccupation"
-                        value={formData.motherOccupation}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Mother's occupation"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Phone Number
-                      </label>
-                      <input
-                        type="tel"
-                        name="motherPhone"
-                        value={formData.motherPhone}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Mother's phone"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Guardian Information */}
-                <div>
-                  <h3 className="text-lg font-medium text-gray-800 mb-4">
-                    Guardian Information (if different from parents)
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Guardian's Name
-                      </label>
-                      <input
-                        type="text"
-                        name="guardianName"
-                        value={formData.guardianName}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Guardian's name"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Relation
-                      </label>
-                      <input
-                        type="text"
-                        name="guardianRelation"
-                        value={formData.guardianRelation}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Relation to student"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Phone Number
-                      </label>
-                      <input
-                        type="tel"
-                        name="guardianPhone"
-                        value={formData.guardianPhone}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Guardian's phone"
-                      />
-                    </div>
-                  </div>
-                </div>
+                ))}
               </div>
             )}
 
@@ -968,258 +817,123 @@ export default function StudentRegistration() {
                   </h2>
                 </div>
 
-                {/* Document Uploads */}
                 <div>
                   <h3 className="text-lg font-medium text-gray-800 mb-4">
                     Upload Documents
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Passport Photo
-                      </label>
-                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-400 transition-colors">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => handleFileUpload(e, "photo")}
-                          className="hidden"
-                          id="photo"
-                        />
-                        <label htmlFor="photo" className="cursor-pointer">
-                          <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                          <p className="text-sm text-gray-600">
-                            Click to upload photo
-                          </p>
-                          {formData.photo && (
-                            <p className="text-xs text-green-600 mt-1">
-                              {formData.photo.name}
-                            </p>
-                          )}
-                        </label>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Signature
-                      </label>
-                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-400 transition-colors">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => handleFileUpload(e, "signature")}
-                          className="hidden"
-                          id="signature"
-                        />
-                        <label htmlFor="signature" className="cursor-pointer">
-                          <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                          <p className="text-sm text-gray-600">
-                            Click to upload signature
-                          </p>
-                          {formData.signature && (
-                            <p className="text-xs text-green-600 mt-1">
-                              {formData.signature.name}
-                            </p>
-                          )}
-                        </label>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        10th Certificate
-                      </label>
-                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-400 transition-colors">
-                        <input
-                          type="file"
-                          accept=".pdf,.jpg,.jpeg,.png"
-                          onChange={(e) =>
-                            handleFileUpload(e, "documents.tenthCertificate")
-                          }
-                          className="hidden"
-                          id="tenth"
-                        />
-                        <label htmlFor="tenth" className="cursor-pointer">
-                          <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                          <p className="text-sm text-gray-600">
-                            Upload 10th certificate
-                          </p>
-                          {formData.documents.tenthCertificate && (
-                            <p className="text-xs text-green-600 mt-1">
-                              {formData.documents.tenthCertificate.name}
-                            </p>
-                          )}
-                        </label>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        12th Certificate
-                      </label>
-                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-400 transition-colors">
-                        <input
-                          type="file"
-                          accept=".pdf,.jpg,.jpeg,.png"
-                          onChange={(e) =>
-                            handleFileUpload(e, "documents.twelfthCertificate")
-                          }
-                          className="hidden"
-                          id="twelfth"
-                        />
-                        <label htmlFor="twelfth" className="cursor-pointer">
-                          <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                          <p className="text-sm text-gray-600">
-                            Upload 12th certificate
-                          </p>
-                          {formData.documents.twelfthCertificate && (
-                            <p className="text-xs text-green-600 mt-1">
-                              {formData.documents.twelfthCertificate.name}
-                            </p>
-                          )}
-                        </label>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Transfer Certificate
-                      </label>
-                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-400 transition-colors">
-                        <input
-                          type="file"
-                          accept=".pdf,.jpg,.jpeg,.png"
-                          onChange={(e) =>
-                            handleFileUpload(e, "documents.transferCertificate")
-                          }
-                          className="hidden"
-                          id="transfer"
-                        />
-                        <label htmlFor="transfer" className="cursor-pointer">
-                          <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                          <p className="text-sm text-gray-600">Upload TC</p>
-                          {formData.documents.transferCertificate && (
-                            <p className="text-xs text-green-600 mt-1">
-                              {formData.documents.transferCertificate.name}
-                            </p>
-                          )}
-                        </label>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Migration Certificate
-                      </label>
-                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-400 transition-colors">
-                        <input
-                          type="file"
-                          accept=".pdf,.jpg,.jpeg,.png"
-                          onChange={(e) =>
-                            handleFileUpload(
-                              e,
-                              "documents.migrationCertificate"
-                            )
-                          }
-                          className="hidden"
-                          id="migration"
-                        />
-                        <label htmlFor="migration" className="cursor-pointer">
-                          <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                          <p className="text-sm text-gray-600">
-                            Upload migration certificate
-                          </p>
-                          {formData.documents.migrationCertificate && (
-                            <p className="text-xs text-green-600 mt-1">
-                              {formData.documents.migrationCertificate.name}
-                            </p>
-                          )}
-                        </label>
-                      </div>
-                    </div>
+                    <FileUpload
+                      label="Passport Photo"
+                      id="photo"
+                      onChange={(e) => handleFileUpload(e, "photo")}
+                      file={formData.photo}
+                    />
+                    <FileUpload
+                      label="Signature"
+                      id="signature"
+                      onChange={(e) => handleFileUpload(e, "signature")}
+                      file={formData.signature}
+                    />
+                    <FileUpload
+                      label="10th Certificate"
+                      id="tenth"
+                      onChange={(e) =>
+                        handleFileUpload(e, "documents.tenthCertificate")
+                      }
+                      file={formData.documents.tenthCertificate}
+                    />
+                    <FileUpload
+                      label="12th Certificate"
+                      id="twelfth"
+                      onChange={(e) =>
+                        handleFileUpload(e, "documents.twelfthCertificate")
+                      }
+                      file={formData.documents.twelfthCertificate}
+                    />
+                    <FileUpload
+                      label="Transfer Certificate"
+                      id="transfer"
+                      onChange={(e) =>
+                        handleFileUpload(e, "documents.transferCertificate")
+                      }
+                      file={formData.documents.transferCertificate}
+                    />
+                    <FileUpload
+                      label="Migration Certificate"
+                      id="migration"
+                      onChange={(e) =>
+                        handleFileUpload(e, "documents.migrationCertificate")
+                      }
+                      file={formData.documents.migrationCertificate}
+                    />
                   </div>
                 </div>
 
-                {/* Login Credentials */}
                 <div>
                   <h3 className="text-lg font-medium text-gray-800 mb-4">
                     Create Login Credentials
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Password *
-                      </label>
-                      <div className="relative">
-                        <input
-                          type={showPassword ? "text" : "password"}
-                          name="password"
-                          value={formData.password}
-                          onChange={handleInputChange}
-                          className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12 ${
-                            errors.password
-                              ? "border-red-500"
-                              : "border-gray-300"
-                          }`}
-                          placeholder="Create a strong password"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                        >
-                          {showPassword ? (
-                            <EyeOff className="w-5 h-5" />
-                          ) : (
-                            <Eye className="w-5 h-5" />
-                          )}
-                        </button>
+                    {["password", "confirmPassword"].map((field) => (
+                      <div key={field}>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          {field === "password"
+                            ? "Password"
+                            : "Confirm Password"}{" "}
+                          *
+                        </label>
+                        <div className="relative">
+                          <input
+                            type={
+                              field === "password"
+                                ? showPassword
+                                  ? "text"
+                                  : "password"
+                                : showConfirmPassword
+                                ? "text"
+                                : "password"
+                            }
+                            name={field}
+                            value={formData[field]}
+                            onChange={handleInputChange}
+                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12 ${
+                              errors[field]
+                                ? "border-red-500"
+                                : "border-gray-300"
+                            }`}
+                            placeholder={
+                              field === "password"
+                                ? "Create a strong password"
+                                : "Confirm your password"
+                            }
+                          />
+                          <button
+                            type="button"
+                            onClick={() =>
+                              field === "password"
+                                ? setShowPassword(!showPassword)
+                                : setShowConfirmPassword(!showConfirmPassword)
+                            }
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                          >
+                            {(
+                              field === "password"
+                                ? showPassword
+                                : showConfirmPassword
+                            ) ? (
+                              <EyeOff className="w-5 h-5" />
+                            ) : (
+                              <Eye className="w-5 h-5" />
+                            )}
+                          </button>
+                        </div>
+                        {errors[field] && (
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors[field]}
+                          </p>
+                        )}
                       </div>
-                      {errors.password && (
-                        <p className="text-red-500 text-sm mt-1">
-                          {errors.password}
-                        </p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Confirm Password *
-                      </label>
-                      <div className="relative">
-                        <input
-                          type={showConfirmPassword ? "text" : "password"}
-                          name="confirmPassword"
-                          value={formData.confirmPassword}
-                          onChange={handleInputChange}
-                          className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12 ${
-                            errors.confirmPassword
-                              ? "border-red-500"
-                              : "border-gray-300"
-                          }`}
-                          placeholder="Confirm your password"
-                        />
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setShowConfirmPassword(!showConfirmPassword)
-                          }
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                        >
-                          {showConfirmPassword ? (
-                            <EyeOff className="w-5 h-5" />
-                          ) : (
-                            <Eye className="w-5 h-5" />
-                          )}
-                        </button>
-                      </div>
-                      {errors.confirmPassword && (
-                        <p className="text-red-500 text-sm mt-1">
-                          {errors.confirmPassword}
-                        </p>
-                      )}
-                    </div>
+                    ))}
                   </div>
 
                   <div className="mt-4 p-4 bg-blue-50 rounded-lg">
@@ -1243,27 +957,28 @@ export default function StudentRegistration() {
                 <button
                   type="button"
                   onClick={prevStep}
-                  className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors flex items-center"
+                  className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                  disabled={isSubmitting}
                 >
                   ← Previous
                 </button>
               )}
-
               <div className="ml-auto">
                 {currentStep < 5 ? (
                   <button
                     type="button"
                     onClick={nextStep}
-                    className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+                    className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                   >
                     Next →
                   </button>
                 ) : (
                   <button
                     type="submit"
-                    className="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+                    className="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={isSubmitting}
                   >
-                    Complete Registration
+                    {isSubmitting ? "Submitting..." : "Complete Registration"}
                   </button>
                 )}
               </div>
@@ -1271,19 +986,24 @@ export default function StudentRegistration() {
           </form>
         </div>
 
-        {/* Footer */}
         <div className="text-center mt-8 text-gray-600">
           <p>
             Already have an account?{" "}
-            <Link
+            <a
               href="/auth?page=login"
               className="text-blue-600 hover:underline"
             >
               Login here
-            </Link>
+            </a>
           </p>
         </div>
       </div>
+
+      <SuccessModal
+        isOpen={showSuccess}
+        onClose={() => setShowSuccess(false)}
+        studentId={studentId}
+      />
     </div>
   );
 }

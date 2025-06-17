@@ -115,7 +115,7 @@ const Header = () => {
         { name: "Login", href: "/#" },
       ],
     },
-    { name: "TRAINING & PLACEMENT", href: "/#" },
+    { name: "TRAINING & PLACEMENT", href: "/t&p" },
   ];
 
   const toggleDropdown = (index) => {
