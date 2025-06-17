@@ -432,8 +432,8 @@ export default function StudentRegistration() {
       { value: "2021", label: "2021" },
     ],
     nationality: [
-      { value: "India", label: "india" },
-      { value: "Other", label: "other" },
+      { value: "india", label: "Indian" },
+      { value: "other", label: "Other" },
     ],
   };
 
