@@ -294,6 +294,23 @@ export default function StudentRegistration() {
       }
     }
 
+    if (step === 2 && formData.currentAddress.pincode) {
+      const phoneRegex = /^[0-9]{6}$/;
+      if (
+        !phoneRegex.test(formData.currentAddress.pincode.replace(/\D/g, ""))
+      ) {
+        newErrors.pincode = "Please enter a valid 6-digit Pin Code";
+      }
+    }
+    if (step === 2 && formData.permanentAddress.pincode) {
+      const phoneRegex = /^[0-9]{6}$/;
+      if (
+        !phoneRegex.test(formData.permanentAddress.pincode.replace(/\D/g, ""))
+      ) {
+        newErrors.pincode = "Please enter a valid 6-digit Pin Code";
+      }
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -609,6 +626,7 @@ export default function StudentRegistration() {
                       name="permanentAddress.pincode"
                       value={formData.permanentAddress.pincode}
                       onChange={handleInputChange}
+                      error={errors.pincode}
                       placeholder="PIN Code"
                     />
                     <FormField
@@ -669,6 +687,7 @@ export default function StudentRegistration() {
                         label="PIN Code"
                         name="currentAddress.pincode"
                         value={formData.currentAddress.pincode}
+                        error={errors.pincode}
                         onChange={handleInputChange}
                         placeholder="PIN Code"
                       />
